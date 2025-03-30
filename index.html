@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+            text-align: left;
+        }
+
+        label,
+        input,
+        select {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        input,
+        select {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333333;
+            padding: 8px;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #444444;
+        }
+
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            border: 1px solid #333333;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Fill in the form to generate a JSON file</h2>
+
+    <form id="jsonForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+
+        <label for="version">Version:</label>
+        <input type="text" id="version" required>
+
+        <label for="vendor">Vendor:</label>
+        <input type="text" id="vendor" required placeholder="Balluff" value="Balluff">
+
+        <label for="type">Type:</label>
+        <select id="type" required>
+            <option value="library">Library</option>
+            <option value="container">Container</option>
+            <option value="application">Application</option>
+        </select>
+
+        <button type="button" onclick="showTemplate()">Show Template</button>
+        <button type="button" onclick="generateJSON()">Download JSON</button>
+
+    </form>
+
+    <pre id="jsonOutput" style="display: none;"></pre>
+    <button id="copyButton" style="display: none;" onclick="copyJSON()">Copy JSON</button>
+
+    <script>
+        function getComponentTemplate() {
+            const name = document.getElementById("name").value;
+            const version = document.getElementById("version").value;
+            const vendor = document.getElementById("vendor").value;
+            const type = document.getElementById("type").value;
+            if (!name || !version || !vendor) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            if (name.length < 3 || version.length < 3 || vendor.length < 3) {
+                alert("Name, Version, and Vendor must be at least 3 characters long.");
+                return;
+            }
+
+            return {
+                "bomFormat": "CycloneDX",
+                "specVersion": "1.6",
+                "version": 1,
+                "metadata": {
+                    "timestamp": new Date().toISOString(),
+                    "component": {
+                        "type": type,
+                        "name": name,
+                        "bom-ref": "urn:uuid:" + crypto.randomUUID(),
+                        "group": vendor,
+                        "version": version,
+                        "description": "Description of the component",
+                        "purl": "pkg:" + vendor.toLowerCase() + "/" + name.toLowerCase() + "@" + version.toLowerCase(),
+                        "licenses": [
+                            {
+                                "license": {
+                                    "id": "MIT"
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+        }
+
+        function generateJSON() {
+            const name = document.getElementById("name").value;
+            const version = document.getElementById("version").value;
+            const vendor = document.getElementById("vendor").value;
+
+            const component_template = getComponentTemplate();
+            if (!component_template) {
+                return;
+            }
+
+            const jsonString = JSON.stringify(component_template, null, 4);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "component_sbom.json";
+            link.click();
+        }
+
+        function showTemplate() {
+            const name = document.getElementById("name").value;
+            const version = document.getElementById("version").value;
+            const vendor = document.getElementById("vendor").value;
+
+            const component_template = getComponentTemplate();
+            if (!component_template) {
+                return;
+            }
+
+            const jsonOutput = document.getElementById("jsonOutput");
+            jsonOutput.textContent = JSON.stringify(component_template, null, 4);
+            jsonOutput.style.display = "block";
+            jsonOutput.style.textAlign = "left";
+            jsonOutput.style.width = "auto";
+            jsonOutput.style.margin = "20px auto";
+
+            const copyButton = document.getElementById("copyButton");
+            copyButton.style.display = "block";
+        }
+
+        function copyJSON() {
+            const jsonOutput = document.getElementById("jsonOutput");
+            navigator.clipboard.writeText(jsonOutput.textContent)
+                .then(() => alert("JSON copied to clipboard!"))
+                .catch(err => alert("Failed to copy JSON: " + err));
+        }
+    </script>
+
+</body>
+
+</html>
