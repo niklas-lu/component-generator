@@ -68,8 +68,18 @@
         <label for="version">Version:</label>
         <input type="text" id="version" required>
 
+        <label for="description">Description (optional):</label>
+        <input type="text" id="description" placeholder="Description of the component">
+
+        <label for="internal" style="display: flex; align-items: left;">
+            Internal:
+            <input type="checkbox" id="internal" onclick="toggleVendor()" style="margin: 0px 0px 0px 10px;width: auto;"
+                checked>
+        </label>
+
         <label for="vendor">Vendor:</label>
-        <input type="text" id="vendor" required placeholder="Balluff" value="Balluff">
+        <input type="text" id="vendor" required placeholder="Balluff" value="Balluff"
+            style="background-color: #333333; color: #777777;" disabled>
 
         <label for="type">Type:</label>
         <select id="type" required>
@@ -78,7 +88,21 @@
             <option value="application">Application</option>
         </select>
 
-        <button type="button" onclick="showTemplate()">Show Template</button>
+        <label for="license">License:</label>
+        <select id="license" required>
+            <option value="MIT">MIT</option>
+            <option value="Apache-2.0">Apache-2.0</option>
+            <option value="GPL-3.0">GPL-3.0</option>
+            <option value="BSD-2-Clause">BSD-2-Clause</option>
+            <option value="BSD-3-Clause">BSD-3-Clause</option>
+            <option value="LGPL-3.0">LGPL-3.0</option>
+            <option value="MPL-2.0">MPL-2.0</option>
+            <option value="CDDL-1.0">CDDL-1.0</option>
+            <option value="EPL-2.0">EPL-2.0</option>
+            <option value="Unlicense" selected>Unlicense</option>
+        </select>
+
+        <button type="button" onclick="showTemplate()">Show JSON</button>
         <button type="button" onclick="generateJSON()">Download JSON</button>
 
     </form>
@@ -87,17 +111,30 @@
     <button id="copyButton" style="display: none;" onclick="copyJSON()">Copy JSON</button>
 
     <script>
+        function toggleVendor() {
+            const vendorInput = document.getElementById("vendor");
+            const internalCheckbox = document.getElementById("internal");
+            vendorInput.disabled = internalCheckbox.checked;
+            vendorInput.style.backgroundColor = internalCheckbox.checked ? "#333333" : "#1e1e1e";
+            vendorInput.style.color = internalCheckbox.checked ? "#777777" : "#ffffff";
+        }
+
         function getComponentTemplate() {
             const name = document.getElementById("name").value;
             const version = document.getElementById("version").value;
-            const vendor = document.getElementById("vendor").value;
+            const vendorInput = document.getElementById("vendor");
             const type = document.getElementById("type").value;
-            if (!name || !version || !vendor) {
+            const license = document.getElementById("license").value;
+            const internal = document.getElementById("internal").checked;
+
+            const vendor = internal ? "Balluff" : vendorInput.value;
+
+            if (!name || !version || (!vendor && !internal)) {
                 alert("Please fill in all fields.");
                 return;
             }
-            if (name.length < 3 || version.length < 3 || vendor.length < 3) {
-                alert("Name, Version, and Vendor must be at least 3 characters long.");
+            if (name.length < 3 || (!internal && vendor.length < 3)) {
+                alert("Name, and Vendor must be at least 3 characters long.");
                 return;
             }
 
@@ -118,7 +155,7 @@
                         "licenses": [
                             {
                                 "license": {
-                                    "id": "MIT"
+                                    "id": license
                                 }
                             }
                         ]
@@ -129,8 +166,6 @@
 
         function generateJSON() {
             const name = document.getElementById("name").value;
-            const version = document.getElementById("version").value;
-            const vendor = document.getElementById("vendor").value;
 
             const component_template = getComponentTemplate();
             if (!component_template) {
@@ -141,14 +176,12 @@
             const blob = new Blob([jsonString], { type: "application/json" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "component_sbom.json";
+            link.download = name.toLowerCase() + "_sbom.json";
             link.click();
         }
 
         function showTemplate() {
             const name = document.getElementById("name").value;
-            const version = document.getElementById("version").value;
-            const vendor = document.getElementById("vendor").value;
 
             const component_template = getComponentTemplate();
             if (!component_template) {
@@ -173,6 +206,11 @@
                 .catch(err => alert("Failed to copy JSON: " + err));
         }
     </script>
+
+    <a href="https://cyclonedx.org/docs/1.6/json" target="_blank"
+        style="color: #005ec9; text-decoration: none; margin-top: 20px; display: inline-block;">
+        CycloneDX JSON Documentation
+    </a>
 
 </body>
 
