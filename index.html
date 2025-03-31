@@ -1,239 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JSON Generator</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #121212;
-            color: #ffffff;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background-color: #121212;
+        color: #ffffff;
+      }
 
-        form {
-            max-width: 400px;
-            margin: auto;
-            text-align: left;
-        }
+      form {
+        max-width: 400px;
+        margin: auto;
+        text-align: left;
+      }
 
-        label,
-        input,
-        select {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
-        }
+      label,
+      input,
+      select {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+      }
 
-        input,
-        select {
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333333;
-            padding: 8px;
-        }
+      input,
+      select {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        border: 1px solid #333333;
+        padding: 8px;
+      }
 
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            background-color: #333333;
-            color: #ffffff;
-            border: none;
-        }
+      button {
+        padding: 10px 15px;
+        cursor: pointer;
+        background-color: #333333;
+        color: #ffffff;
+        border: none;
+      }
 
-        button:hover {
-            background-color: #444444;
-        }
+      button:hover {
+        background-color: #444444;
+      }
 
-        pre {
-            background: #1e1e1e;
-            padding: 10px;
-            border: 1px solid #333333;
-            color: #ffffff;
-        }
+      pre {
+        background: #1e1e1e;
+        padding: 10px;
+        border: 1px solid #333333;
+        color: #ffffff;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <h2>Fill in the form to generate a JSON file</h2>
 
     <form id="jsonForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" required>
+      <label for="name">Name:</label>
+      <input type="text" id="name" required />
 
-        <label for="version">Version:</label>
-        <input type="text" id="version" required>
+      <label for="version">Version:</label>
+      <input type="text" id="version" required />
 
-        <label for="description">Description (optional):</label>
-        <input type="text" id="description" placeholder="Description of the component">
+      <label for="description">Description (optional):</label>
+      <input
+        type="text"
+        id="description"
+        placeholder="Description of the component"
+      />
 
-        <label for="internal" style="display: flex; align-items: left;">
-            Internal:
-            <input type="checkbox" id="internal" onclick="toggleVendor()" style="margin: 0px 0px 0px 10px;width: auto;"
-                checked>
-        </label>
+      <label for="internal" style="display: flex; align-items: left">
+        Internal:
+        <input
+          type="checkbox"
+          id="internal"
+          onclick="toggleVendor()"
+          style="margin: 0px 0px 0px 10px; width: auto"
+          checked
+        />
+      </label>
 
-        <label for="vendor">Vendor:</label>
-        <input type="text" id="vendor" required placeholder="Balluff" value="Balluff"
-            style="background-color: #333333; color: #777777;" disabled>
+      <label for="vendor" id="vendorLabel" style="display: none">Vendor:</label>
+      <input
+        type="text"
+        id="vendor"
+        required
+        placeholder="Balluff"
+        value="Balluff"
+        style="display: none"
+      />
 
-        <label for="type">Type:</label>
-        <select id="type" required>
-            <option value="library">Library</option>
-            <option value="container">Container</option>
-            <option value="application">Application</option>
-        </select>
+      <label for="purl" id="purlLabel" style="display: none"
+        >Purl (Package URL):</label
+      >
+      <input
+        type="text"
+        id="purl"
+        placeholder="pkg:vendor/component@version"
+        style="display: none"
+      />
 
-        <label for="license">License:</label>
-        <select id="license" required>
-            <option value="MIT">MIT</option>
-            <option value="Apache-2.0">Apache-2.0</option>
-            <option value="GPL-3.0">GPL-3.0</option>
-            <option value="BSD-2-Clause">BSD-2-Clause</option>
-            <option value="BSD-3-Clause">BSD-3-Clause</option>
-            <option value="LGPL-3.0">LGPL-3.0</option>
-            <option value="MPL-2.0">MPL-2.0</option>
-            <option value="CDDL-1.0">CDDL-1.0</option>
-            <option value="EPL-2.0">EPL-2.0</option>
-            <option value="Unlicense" selected>Unlicense</option>
-        </select>
+      <label for="cpe" id="cpeLabel" style="display: none"
+        >Cpe (Common Platform Enumeration):</label
+      >
+      <input
+        type="text"
+        id="cpe"
+        placeholder="cpe:2.3:a:vendor:component:version"
+        style="display: none"
+      />
 
-        <button type="button" onclick="showTemplate()">Show JSON</button>
-        <button type="button" onclick="copyJSON()">Copy JSON</button>
-        <button type="button" onclick="generateJSON()">Download JSON</button>
+      <label for="type">Type:</label>
+      <select id="type" required>
+        <option value="Application">Application</option>
+        <option value="Container">Container</option>
+        <option value="Device">Device</option>
+        <option value="File">File</option>
+        <option value="Firmware">Firmware</option>
+        <option value="Framework">Framework</option>
+        <option value="Library">Library</option>
+        <option value="Operating System">Operating System</option>
+      </select>
 
+      <label for="license">License:</label>
+      <select id="license" required>
+        <option value="MIT">MIT</option>
+        <option value="Apache-2.0">Apache-2.0</option>
+        <option value="GPL-3.0">GPL-3.0</option>
+        <option value="BSD-2-Clause">BSD-2-Clause</option>
+        <option value="BSD-3-Clause">BSD-3-Clause</option>
+        <option value="LGPL-3.0">LGPL-3.0</option>
+        <option value="MPL-2.0">MPL-2.0</option>
+        <option value="CDDL-1.0">CDDL-1.0</option>
+        <option value="EPL-2.0">EPL-2.0</option>
+        <option value="Unlicense" selected>Unlicense</option>
+      </select>
+
+      <label for="reference">External reference:</label>
+      <input
+        type="text"
+        id="reference"
+        placeholder="Link to the components website/ origin"
+      />
+
+      <button type="button" onclick="showTemplate()">Show JSON</button>
+      <button type="button" onclick="copyJSON()">Copy JSON</button>
+      <button type="button" onclick="generateJSON()">Download JSON</button>
     </form>
 
-    <pre id="jsonOutput" style="display: none;"></pre>
-
+    <pre id="jsonOutput" style="display: none"></pre>
 
     <script>
-        function toggleVendor() {
-            const vendorInput = document.getElementById("vendor");
-            const internalCheckbox = document.getElementById("internal");
-            vendorInput.disabled = internalCheckbox.checked;
-            vendorInput.style.backgroundColor = internalCheckbox.checked ? "#333333" : "#1e1e1e";
-            vendorInput.style.color = internalCheckbox.checked ? "#777777" : "#ffffff";
+      function toggleVendor() {
+        const vendorInput = document.getElementById("vendor");
+        const vendorLabel = document.getElementById("vendorLabel");
+        const purlInput = document.getElementById("purl");
+        const purlLabel = document.getElementById("purlLabel");
+        const cpeInput = document.getElementById("cpe");
+        const cpeLabel = document.getElementById("cpeLabel");
+        const internalCheckbox = document.getElementById("internal");
+
+        if (internalCheckbox.checked) {
+          vendorInput.style.display = "none";
+          vendorLabel.style.display = "none";
+          purlInput.style.display = "none";
+          purlLabel.style.display = "none";
+          cpeInput.style.display = "none";
+          cpeLabel.style.display = "none";
+        } else {
+          vendorInput.style.display = "block";
+          vendorLabel.style.display = "block";
+          purlInput.style.display = "block";
+          purlLabel.style.display = "block";
+          cpeInput.style.display = "block";
+          cpeLabel.style.display = "block";
+        }
+      }
+
+      function getComponentTemplate() {
+        const name = document.getElementById("name").value;
+        const version = document.getElementById("version").value;
+        const vendorInput = document.getElementById("vendor");
+        const purlInput = document.getElementById("purl");
+        const cpe = document.getElementById("cpe").value;
+        const type = document.getElementById("type").value;
+        const license = document.getElementById("license").value;
+        const reference = document.getElementById("reference").value;
+        const internal = document.getElementById("internal").checked;
+
+        const vendor = internal ? "Balluff" : vendorInput.value;
+        const purl = internal
+          ? `pkg:${vendor.toLowerCase()}/${name.toLowerCase()}@${version.toLowerCase()}`
+          : purlInput.value;
+        if (!name || !version || (!vendor && !internal)) {
+          alert("Please fill in all fields.");
+          return;
+        }
+        if (name.length < 3 || (!internal && vendor.length < 3)) {
+          alert("Name, and Vendor must be at least 3 characters long.");
+          return;
         }
 
-        function getComponentTemplate() {
-            const name = document.getElementById("name").value;
-            const version = document.getElementById("version").value;
-            const vendorInput = document.getElementById("vendor");
-            const type = document.getElementById("type").value;
-            const license = document.getElementById("license").value;
-            const internal = document.getElementById("internal").checked;
+        return {
+          bomFormat: "CycloneDX",
+          specVersion: "1.6",
+          version: 1,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            component: {
+              type: type,
+              name: name,
+              "bom-ref": "urn:uuid:" + crypto.randomUUID(),
+              group: vendor,
+              version: version,
+              description: "Description of the component",
+              purl: purl,
+              cpe: cpe,
+              externalReferences: [
+                {
+                  url: reference,
+                  type: "website",
+                },
+              ],
+              licenses: [
+                {
+                  license: {
+                    id: license,
+                  },
+                },
+              ],
+            },
+          },
+        };
+      }
 
-            const vendor = internal ? "Balluff" : vendorInput.value;
+      function generateJSON() {
+        const name = document.getElementById("name").value;
 
-            if (!name || !version || (!vendor && !internal)) {
-                alert("Please fill in all fields.");
-                return;
-            }
-            if (name.length < 3 || (!internal && vendor.length < 3)) {
-                alert("Name, and Vendor must be at least 3 characters long.");
-                return;
-            }
-
-            return {
-                "bomFormat": "CycloneDX",
-                "specVersion": "1.6",
-                "version": 1,
-                "metadata": {
-                    "timestamp": new Date().toISOString(),
-                    "component": {
-                        "type": type,
-                        "name": name,
-                        "bom-ref": "urn:uuid:" + crypto.randomUUID(),
-                        "group": vendor,
-                        "version": version,
-                        "description": "Description of the component",
-                        "purl": "pkg:" + vendor.toLowerCase() + "/" + name.toLowerCase() + "@" + version.toLowerCase(),
-                        "licenses": [
-                            {
-                                "license": {
-                                    "id": license
-                                }
-                            }
-                        ]
-                    }
-                }
-            };
+        const component_template = getComponentTemplate();
+        if (!component_template) {
+          return;
         }
 
-        function generateJSON() {
-            const name = document.getElementById("name").value;
+        const jsonString = JSON.stringify(component_template, null, 4);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = name.toLowerCase() + "_sbom.json";
+        link.click();
+      }
 
-            const component_template = getComponentTemplate();
-            if (!component_template) {
-                return;
-            }
+      function showTemplate() {
+        const name = document.getElementById("name").value;
 
-            const jsonString = JSON.stringify(component_template, null, 4);
-            const blob = new Blob([jsonString], { type: "application/json" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = name.toLowerCase() + "_sbom.json";
-            link.click();
+        const component_template = getComponentTemplate();
+        if (!component_template) {
+          return;
         }
 
-        function showTemplate() {
-            const name = document.getElementById("name").value;
+        const jsonOutput = document.getElementById("jsonOutput");
+        jsonOutput.textContent = JSON.stringify(component_template, null, 4);
+        jsonOutput.style.display = "block";
+        jsonOutput.style.textAlign = "left";
+        jsonOutput.style.width = "auto";
+        jsonOutput.style.margin = "20px auto";
 
-            const component_template = getComponentTemplate();
-            if (!component_template) {
-                return;
-            }
+        const copyButton = document.getElementById("copyButton");
+        copyButton.style.display = "block";
+      }
 
-            const jsonOutput = document.getElementById("jsonOutput");
-            jsonOutput.textContent = JSON.stringify(component_template, null, 4);
-            jsonOutput.style.display = "block";
-            jsonOutput.style.textAlign = "left";
-            jsonOutput.style.width = "auto";
-            jsonOutput.style.margin = "20px auto";
-
-            const copyButton = document.getElementById("copyButton");
-            copyButton.style.display = "block";
+      function copyJSON() {
+        const component_template = getComponentTemplate();
+        if (!component_template) {
+          return;
         }
+        navigator.clipboard
+          .writeText(JSON.stringify(component_template, null, 4))
+          .then(() => {
+            const alertBox = document.createElement("div");
+            alertBox.textContent = "JSON copied to clipboard!";
+            alertBox.style.position = "fixed";
+            alertBox.style.bottom = "20px";
+            alertBox.style.left = "50%";
+            alertBox.style.bottom = "50%";
+            alertBox.style.transform = "translate(-50%, 50%)";
+            alertBox.style.backgroundColor = "#333333";
+            alertBox.style.color = "#ffffff";
+            alertBox.style.padding = "10px";
+            alertBox.style.borderRadius = "5px";
+            alertBox.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+            document.body.appendChild(alertBox);
 
-        function copyJSON() {
-            const component_template = getComponentTemplate();
-            if (!component_template) {
-                return;
-            }
-            navigator.clipboard.writeText(JSON.stringify(component_template, null, 4))
-                .then(() => {
-                    const alertBox = document.createElement("div");
-                    alertBox.textContent = "JSON copied to clipboard!";
-                    alertBox.style.position = "fixed";
-                    alertBox.style.bottom = "20px";
-                    alertBox.style.left = "50%";
-                    alertBox.style.bottom = "50%";
-                    alertBox.style.transform = "translate(-50%, 50%)";
-                    alertBox.style.backgroundColor = "#333333";
-                    alertBox.style.color = "#ffffff";
-                    alertBox.style.padding = "10px";
-                    alertBox.style.borderRadius = "5px";
-                    alertBox.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
-                    document.body.appendChild(alertBox);
-
-                    setTimeout(() => {
-                        document.body.removeChild(alertBox);
-                    }, 3000);
-                })
-                .catch(err => alert("Failed to copy JSON: " + err));
-        }
+            setTimeout(() => {
+              document.body.removeChild(alertBox);
+            }, 3000);
+          })
+          .catch((err) => alert("Failed to copy JSON: " + err));
+      }
     </script>
 
-    <a href="https://cyclonedx.org/docs/1.6/json" target="_blank"
-        style="color: #005ec9; text-decoration: none; margin-top: 20px; display: inline-block;">
-        CycloneDX JSON Documentation
+    <a
+      href="https://cyclonedx.org/docs/1.6/json"
+      target="_blank"
+      style="
+        color: #005ec9;
+        text-decoration: none;
+        margin-top: 20px;
+        display: inline-block;
+      "
+    >
+      CycloneDX JSON Documentation
     </a>
-
-</body>
-
+  </body>
 </html>
