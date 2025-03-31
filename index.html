@@ -252,7 +252,13 @@
             component: {
               type: type,
               name: name,
-              "bom-ref": "urn:uuid:" + crypto.randomUUID(),
+              "bom-ref":
+                "urn:uuid:" +
+                name.toLowerCase() +
+                ":" +
+                version.toLowerCase() +
+                ":" +
+                crypto.randomUUID(),
               group: vendor,
               version: version,
               description: "Description of the component",
