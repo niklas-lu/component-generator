@@ -73,47 +73,6 @@
         placeholder="Description of the component"
       />
 
-      <label for="internal" style="display: flex; align-items: left">
-        Internal:
-        <input
-          type="checkbox"
-          id="internal"
-          onclick="toggleVendor()"
-          style="margin: 0px 0px 0px 10px; width: auto"
-          checked
-        />
-      </label>
-
-      <label for="vendor" id="vendorLabel" style="display: none">Vendor:</label>
-      <input
-        type="text"
-        id="vendor"
-        required
-        placeholder="Balluff"
-        value="Balluff"
-        style="display: none"
-      />
-
-      <label for="purl" id="purlLabel" style="display: none"
-        >Purl (Package URL):</label
-      >
-      <input
-        type="text"
-        id="purl"
-        placeholder="pkg:vendor/component@version"
-        style="display: none"
-      />
-
-      <label for="cpe" id="cpeLabel" style="display: none"
-        >Cpe (Common Platform Enumeration):</label
-      >
-      <input
-        type="text"
-        id="cpe"
-        placeholder="cpe:2.3:a:vendor:component:version"
-        style="display: none"
-      />
-
       <label for="type">Type:</label>
       <select id="type" required>
         <option value="Application">Application</option>
@@ -140,11 +99,54 @@
         <option value="Unlicense" selected>Unlicense</option>
       </select>
 
-      <label for="reference">External reference:</label>
+      <label for="internal" style="display: flex; align-items: left">
+        Internal:
+        <input
+          type="checkbox"
+          id="internal"
+          onclick="toggleVendor()"
+          style="margin: 0px 0px 0px 10px; width: auto"
+          checked
+        />
+      </label>
+
+      <label for="vendor" id="vendorLabel" style="display: none">Vendor:</label>
+      <input
+        type="text"
+        id="vendor"
+        required
+        placeholder="Vendor of the component"
+        style="display: none"
+      />
+
+      <label for="purl" id="purlLabel" style="display: none"
+        >Purl (Package URL):</label
+      >
+      <input
+        type="text"
+        id="purl"
+        placeholder="pkg:vendor/component@version"
+        style="display: none"
+      />
+
+      <label for="cpe" id="cpeLabel" style="display: none"
+        >Cpe (Common Platform Enumeration):</label
+      >
+      <input
+        type="text"
+        id="cpe"
+        placeholder="cpe:2.3:a:vendor:component:version"
+        style="display: none"
+      />
+
+      <label for="reference" id="referenceLabel" style="display: none"
+        >External reference:</label
+      >
       <input
         type="text"
         id="reference"
         placeholder="Link to the components website/ origin"
+        style="display: none"
       />
 
       <button type="button" onclick="showTemplate()">Show JSON</button>
@@ -162,6 +164,8 @@
         const purlLabel = document.getElementById("purlLabel");
         const cpeInput = document.getElementById("cpe");
         const cpeLabel = document.getElementById("cpeLabel");
+        const referenceInput = document.getElementById("reference");
+        const referenceLabel = document.getElementById("referenceLabel");
         const internalCheckbox = document.getElementById("internal");
 
         if (internalCheckbox.checked) {
@@ -171,6 +175,8 @@
           purlLabel.style.display = "none";
           cpeInput.style.display = "none";
           cpeLabel.style.display = "none";
+          referenceInput.style.display = "none";
+          referenceLabel.style.display = "none";
         } else {
           vendorInput.style.display = "block";
           vendorLabel.style.display = "block";
@@ -178,6 +184,8 @@
           purlLabel.style.display = "block";
           cpeInput.style.display = "block";
           cpeLabel.style.display = "block";
+          referenceInput.style.display = "block";
+          referenceLabel.style.display = "block";
         }
       }
 
@@ -186,22 +194,52 @@
         const version = document.getElementById("version").value;
         const vendorInput = document.getElementById("vendor");
         const purlInput = document.getElementById("purl");
-        const cpe = document.getElementById("cpe").value;
+        const cpeInput = document.getElementById("cpe");
         const type = document.getElementById("type").value;
         const license = document.getElementById("license").value;
-        const reference = document.getElementById("reference").value;
+        const referenceInput = document.getElementById("reference");
         const internal = document.getElementById("internal").checked;
 
         const vendor = internal ? "Balluff" : vendorInput.value;
+        const cpe = internal ? "" : cpeInput.value;
         const purl = internal
           ? `pkg:${vendor.toLowerCase()}/${name.toLowerCase()}@${version.toLowerCase()}`
           : purlInput.value;
+        const reference = internal ? "" : referenceInput.value;
+
+        // Validation for required fields
         if (!name || !version || (!vendor && !internal)) {
           alert("Please fill in all fields.");
           return;
         }
         if (name.length < 3 || (!internal && vendor.length < 3)) {
           alert("Name, and Vendor must be at least 3 characters long.");
+          return;
+        }
+
+        // Validation for purl if not empty
+        if (
+          purl &&
+          !/^pkg:[a-z0-9]+\/[a-z0-9\-_.]+@[a-z0-9\-_.]+$/i.test(purl)
+        ) {
+          alert(
+            "Invalid Purl format. Expected format: pkg:vendor/component@version"
+          );
+          return;
+        }
+
+        // Validation for cpe if not empty
+        // cpe naming convention: https://cpe.mitre.org/specification/
+        // cpe validation regex: https://csrc.nist.gov/schema/cpe/2.3/cpe-naming_2.3.xsd
+        if (
+          cpe &&
+          !/^cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}$/i.test(
+            cpe
+          )
+        ) {
+          alert(
+            "Invalid CPE format. Please follow the official CPE specification."
+          );
           return;
         }
 
