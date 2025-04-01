@@ -5,26 +5,65 @@ A simple web-based tool to generate CycloneDX JSON files for software components
 ## Features
 
 - Generate CycloneDX JSON files for components.
-- Supports various component types and licenses.
 - Option to mark components as internal or external.
 - Provides a preview of the generated JSON.
 - Copy JSON to clipboard or download it as a file.
+- Validation for `purl` and `cpe` fields:
+  - **Purl**: Must follow the format `pkg:vendor/component@version`.
+  - **CPE**: Must follow the official CPE specification regex:
+    ```
+    cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}
+    ```
 
 ## Usage
 
 1. Open the [Component Generator](https://niklas-lu.github.io/component-generator/).
-2. Fill in the form with the required details:
-   - **Name**: Name of the component (minimum 3 characters).
-   - **Version**: Version of the component.
-   - **Description**: Optional description of the component.
-   - **Internal**: Check if the component is internal (disables vendor input).
-   - **Vendor**: Vendor name (enabled if the component is external).
-   - **Type**: Select the type of the component.
-   - **License**: Choose a license for the component.
-   - **External Reference**: Provide a link to the component's website or origin.
-3. Click **Show JSON** to preview the generated JSON.
-4. Use **Copy JSON** to copy the JSON to your clipboard.
-5. Click **Download JSON** to save the JSON file to your device.
+2. Fill in the form fields:
+   - **Name**: The name of the component (minimum 3 characters).
+   - **Version**: The version of the component.
+   - **Type**: Select the type of the component (e.g., Application, Library).
+   - **License**: Select the license type.
+   - **Internal**: Check this box if the component is internal. If unchecked, additional fields for `vendor`, `purl`, `cpe`, and `reference` will appear.
+3. Click:
+   - **Show JSON**: To preview the generated JSON.
+   - **Copy JSON**: To copy the JSON to the clipboard.
+   - **Download JSON**: To download the JSON file.
+
+## Example JSON Output
+
+```json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-10-05T12:34:56.789Z",
+    "component": {
+      "type": "Application",
+      "name": "example-component",
+      "bom-ref": "urn:uuid:example-component:1.0:123e4567-e89b-12d3-a456-426614174000",
+      "group": "ExampleVendor",
+      "version": "1.0",
+      "description": "Description of the component",
+      "purl": "pkg:examplevendor/example-component@1.0",
+      "cpe": "cpe:2.3:a:examplevendor:example-component:1.0",
+      "externalReferences": [
+        {
+          "url": "https://example.com",
+          "type": "website"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Live Demo
 
