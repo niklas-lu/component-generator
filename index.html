@@ -1,364 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JSON Generator</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
-        background-color: #121212;
-        color: #ffffff;
-      }
+<link rel="stylesheet" href="style.css" />
 
-      form {
-        max-width: 400px;
-        margin: auto;
-        text-align: left;
-      }
+<div class="json-generator">
+  <h2>Fill in the form to generate a JSON file</h2>
 
-      label,
-      input,
-      select {
-        display: block;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      input,
-      select {
-        background-color: #1e1e1e;
-        color: #ffffff;
-        border: 1px solid #333333;
-        padding: 8px;
-      }
-
-      button {
-        padding: 10px 15px;
-        cursor: pointer;
-        background-color: #333333;
-        color: #ffffff;
-        border: none;
-      }
-
-      button:hover {
-        background-color: #444444;
-      }
-
-      pre {
-        background: #1e1e1e;
-        padding: 10px;
-        border: 1px solid #333333;
-        color: #ffffff;
-      }
-    </style>
-  </head>
-
-  <body>
-    <h2>Fill in the form to generate a JSON file</h2>
-
-    <form id="jsonForm">
-      <label for="name">Name:</label>
-      <input type="text" id="name" required />
-
-      <label for="version">Version:</label>
-      <input type="text" id="version" required />
-
-      <label for="description">Description (optional):</label>
+  <form id="jsonForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required />
+    <label for="version">Version:</label>
+    <input type="text" id="version" required />
+    <label for="description">Description (optional):</label>
+    <input
+      type="text"
+      id="description"
+      placeholder="Description of the component"
+    />
+    <label for="type">Type:</label>
+    <select id="type" required>
+      <option value="Application">Application</option>
+      <option value="Container">Container</option>
+      <option value="Device">Device</option>
+      <option value="File">File</option>
+      <option value="Firmware">Firmware</option>
+      <option value="Framework">Framework</option>
+      <option value="Library">Library</option>
+      <option value="Operating System">Operating System</option>
+    </select>
+    <label for="license">License:</label>
+    <select id="license" required>
+      <option value="MIT">MIT</option>
+      <option value="Apache-2.0">Apache-2.0</option>
+      <option value="GPL-3.0">GPL-3.0</option>
+      <option value="BSD-2-Clause">BSD-2-Clause</option>
+      <option value="BSD-3-Clause">BSD-3-Clause</option>
+      <option value="LGPL-3.0">LGPL-3.0</option>
+      <option value="MPL-2.0">MPL-2.0</option>
+      <option value="CDDL-1.0">CDDL-1.0</option>
+      <option value="EPL-2.0">EPL-2.0</option>
+      <option value="Unlicense" selected>Unlicense</option>
+    </select>
+    <label for="internal" style="display: flex; align-items: left">
+      Internal:
       <input
-        type="text"
-        id="description"
-        placeholder="Description of the component"
+        type="checkbox"
+        id="internal"
+        onclick="toggleVendor()"
+        style="margin: 0px 0px 0px 10px; width: auto"
+        checked
       />
-
-      <label for="type">Type:</label>
-      <select id="type" required>
-        <option value="Application">Application</option>
-        <option value="Container">Container</option>
-        <option value="Device">Device</option>
-        <option value="File">File</option>
-        <option value="Firmware">Firmware</option>
-        <option value="Framework">Framework</option>
-        <option value="Library">Library</option>
-        <option value="Operating System">Operating System</option>
-      </select>
-
-      <label for="license">License:</label>
-      <select id="license" required>
-        <option value="MIT">MIT</option>
-        <option value="Apache-2.0">Apache-2.0</option>
-        <option value="GPL-3.0">GPL-3.0</option>
-        <option value="BSD-2-Clause">BSD-2-Clause</option>
-        <option value="BSD-3-Clause">BSD-3-Clause</option>
-        <option value="LGPL-3.0">LGPL-3.0</option>
-        <option value="MPL-2.0">MPL-2.0</option>
-        <option value="CDDL-1.0">CDDL-1.0</option>
-        <option value="EPL-2.0">EPL-2.0</option>
-        <option value="Unlicense" selected>Unlicense</option>
-      </select>
-
-      <label for="internal" style="display: flex; align-items: left">
-        Internal:
-        <input
-          type="checkbox"
-          id="internal"
-          onclick="toggleVendor()"
-          style="margin: 0px 0px 0px 10px; width: auto"
-          checked
-        />
-      </label>
-
-      <label for="vendor" id="vendorLabel" style="display: none">Vendor:</label>
-      <input
-        type="text"
-        id="vendor"
-        required
-        placeholder="Vendor of the component"
-        style="display: none"
-      />
-
-      <label for="purl" id="purlLabel" style="display: none"
-        >Purl (Package URL):</label
+    </label>
+    <label for="vendor" id="vendorLabel" style="display: none">Vendor:</label>
+    <input
+      type="text"
+      id="vendor"
+      required
+      placeholder="Vendor of the component"
+      style="display: none"
+    />
+    <label for="purl" id="purlLabel" style="display: none">
+      Purl (Package URL):
+      <span
+        title="A PURL (Package URL) is a standardized URL format to identify and locate software packages."
+        >❔</span
       >
-      <input
-        type="text"
-        id="purl"
-        placeholder="pkg:vendor/component@version"
-        style="display: none"
-      />
-
-      <label for="cpe" id="cpeLabel" style="display: none"
-        >Cpe (Common Platform Enumeration):</label
+    </label>
+    <input
+      type="text"
+      id="purl"
+      placeholder="pkg:vendor/component@version"
+      style="display: none"
+    />
+    <label for="cpe" id="cpeLabel" style="display: none">
+      CPE (Common Platform Enumeration):
+      <span
+        title="A CPE (Common Platform Enumeration) is a standardized method for naming software, hardware, and firmware."
+        >❔</span
       >
-      <input
-        type="text"
-        id="cpe"
-        placeholder="cpe:2.3:a:vendor:component:version"
-        style="display: none"
-      />
-
-      <label for="reference" id="referenceLabel" style="display: none"
-        >External reference:</label
-      >
-      <input
-        type="text"
-        id="reference"
-        placeholder="Link to the components website/ origin"
-        style="display: none"
-      />
-
-      <button type="button" onclick="showTemplate()">Show JSON</button>
-      <button type="button" onclick="copyJSON()">Copy JSON</button>
-      <button type="button" onclick="generateJSON()">Download JSON</button>
-    </form>
-
-    <pre id="jsonOutput" style="display: none"></pre>
-
-    <script>
-      function toggleVendor() {
-        const vendorInput = document.getElementById("vendor");
-        const vendorLabel = document.getElementById("vendorLabel");
-        const purlInput = document.getElementById("purl");
-        const purlLabel = document.getElementById("purlLabel");
-        const cpeInput = document.getElementById("cpe");
-        const cpeLabel = document.getElementById("cpeLabel");
-        const referenceInput = document.getElementById("reference");
-        const referenceLabel = document.getElementById("referenceLabel");
-        const internalCheckbox = document.getElementById("internal");
-
-        if (internalCheckbox.checked) {
-          vendorInput.style.display = "none";
-          vendorLabel.style.display = "none";
-          purlInput.style.display = "none";
-          purlLabel.style.display = "none";
-          cpeInput.style.display = "none";
-          cpeLabel.style.display = "none";
-          referenceInput.style.display = "none";
-          referenceLabel.style.display = "none";
-        } else {
-          vendorInput.style.display = "block";
-          vendorLabel.style.display = "block";
-          purlInput.style.display = "block";
-          purlLabel.style.display = "block";
-          cpeInput.style.display = "block";
-          cpeLabel.style.display = "block";
-          referenceInput.style.display = "block";
-          referenceLabel.style.display = "block";
-        }
-      }
-
-      function getComponentTemplate() {
-        const name = document.getElementById("name").value;
-        const version = document.getElementById("version").value;
-        const vendorInput = document.getElementById("vendor");
-        const purlInput = document.getElementById("purl");
-        const cpeInput = document.getElementById("cpe");
-        const type = document.getElementById("type").value;
-        const license = document.getElementById("license").value;
-        const referenceInput = document.getElementById("reference");
-        const internal = document.getElementById("internal").checked;
-
-        const vendor = internal ? "Balluff" : vendorInput.value;
-        const cpe = internal ? "" : cpeInput.value;
-        const purl = internal
-          ? `pkg:${vendor.toLowerCase()}/${name.toLowerCase()}@${version.toLowerCase()}`
-          : purlInput.value;
-        const reference = internal ? "" : referenceInput.value;
-
-        // Validation for required fields
-        if (!name || !version || (!vendor && !internal)) {
-          alert("Please fill in all fields.");
-          return;
-        }
-        if (name.length < 3 || (!internal && vendor.length < 3)) {
-          alert("Name, and Vendor must be at least 3 characters long.");
-          return;
-        }
-
-        // Validation for purl if not empty
-        if (
-          purl &&
-          !internal &&
-          !/^pkg:[a-z0-9]+\/[a-z0-9\-_.]+@[a-z0-9\-_.]+$/i.test(purl)
-        ) {
-          alert(
-            "Invalid Purl format. Expected format: pkg:vendor/component@version"
-          );
-          return;
-        }
-
-        // Validation for cpe if not empty
-        // cpe naming convention: https://cpe.mitre.org/specification/
-        // cpe validation regex: https://csrc.nist.gov/schema/cpe/2.3/cpe-naming_2.3.xsd
-        if (
-          cpe &&
-          !/^cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}$/i.test(
-            cpe
-          )
-        ) {
-          alert(
-            "Invalid CPE format. Please follow the official CPE specification."
-          );
-          return;
-        }
-
-        return {
-          bomFormat: "CycloneDX",
-          specVersion: "1.6",
-          version: 1,
-          metadata: {
-            timestamp: new Date().toISOString(),
-            component: {
-              type: type,
-              name: name,
-              "bom-ref":
-                "urn:uuid:" +
-                name.toLowerCase() +
-                ":" +
-                version.toLowerCase() +
-                ":" +
-                crypto.randomUUID(),
-              group: vendor,
-              version: version,
-              description: "Description of the component",
-              purl: purl,
-              cpe: cpe,
-              externalReferences: [
-                {
-                  url: reference,
-                  type: "website",
-                },
-              ],
-              licenses: [
-                {
-                  license: {
-                    id: license,
-                  },
-                },
-              ],
-            },
-          },
-        };
-      }
-
-      function generateJSON() {
-        const name = document.getElementById("name").value;
-
-        const component_template = getComponentTemplate();
-        if (!component_template) {
-          return;
-        }
-
-        const jsonString = JSON.stringify(component_template, null, 4);
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = name.toLowerCase() + "_sbom.json";
-        link.click();
-      }
-
-      function showTemplate() {
-        const name = document.getElementById("name").value;
-
-        const component_template = getComponentTemplate();
-        if (!component_template) {
-          return;
-        }
-
-        const jsonOutput = document.getElementById("jsonOutput");
-        jsonOutput.textContent = JSON.stringify(component_template, null, 4);
-        jsonOutput.style.display = "block";
-        jsonOutput.style.textAlign = "left";
-        jsonOutput.style.width = "auto";
-        jsonOutput.style.margin = "20px auto";
-
-        const copyButton = document.getElementById("copyButton");
-        copyButton.style.display = "block";
-      }
-
-      function copyJSON() {
-        const component_template = getComponentTemplate();
-        if (!component_template) {
-          return;
-        }
-        navigator.clipboard
-          .writeText(JSON.stringify(component_template, null, 4))
-          .then(() => {
-            const alertBox = document.createElement("div");
-            alertBox.textContent = "JSON copied to clipboard!";
-            alertBox.style.position = "fixed";
-            alertBox.style.bottom = "20px";
-            alertBox.style.left = "50%";
-            alertBox.style.bottom = "50%";
-            alertBox.style.transform = "translate(-50%, 50%)";
-            alertBox.style.backgroundColor = "#333333";
-            alertBox.style.color = "#ffffff";
-            alertBox.style.padding = "10px";
-            alertBox.style.borderRadius = "5px";
-            alertBox.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
-            document.body.appendChild(alertBox);
-
-            setTimeout(() => {
-              document.body.removeChild(alertBox);
-            }, 3000);
-          })
-          .catch((err) => alert("Failed to copy JSON: " + err));
-      }
-    </script>
-
-    <a
-      href="https://cyclonedx.org/docs/1.6/json"
-      target="_blank"
-      style="
-        color: #005ec9;
-        text-decoration: none;
-        margin-top: 20px;
-        display: inline-block;
-      "
+    </label>
+    <input
+      type="text"
+      id="cpe"
+      placeholder="cpe:2.3:a:vendor:component:version"
+      style="display: none"
+    />
+    <label for="reference" id="referenceLabel" style="display: none"
+      >External reference:</label
     >
-      CycloneDX JSON Documentation
-    </a>
-  </body>
-</html>
+    <input
+      type="text"
+      id="reference"
+      placeholder="Link to the components website/ origin"
+      style="display: none"
+    />
+    <label for="licenseText" id="licenseTextLabel" style="display: none"
+      >License text (optional):</label
+    >
+    <textarea
+      id="licenseText"
+      placeholder="Custom license text"
+      style="display: none; width: 100%; margin-bottom: 20px"
+    ></textarea>
+    <button type="button" onclick="showTemplate()">Show JSON</button>
+    <button type="button" onclick="copyJSON()">Copy JSON</button>
+    <button type="button" onclick="generateJSON()">Download JSON</button>
+  </form>
+
+  <pre id="jsonOutput" style="display: none"></pre>
+</div>
+<script src="script.js"></script>
+<div class="json-generator">
+  <a
+    href="https://cyclonedx.org/docs/1.6/json"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="
+      color: #005ec9;
+      text-decoration: none;
+      margin-top: 20px;
+      display: inline-block;
+    "
+  >
+    CycloneDX JSON Documentation
+  </a>
+</div>

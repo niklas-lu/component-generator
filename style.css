@@ -1,0 +1,56 @@
+.json-generator {
+  font-family: Arial, sans-serif;
+  text-align: left;
+  color: #333333;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.json-generator form {
+  max-width: 400px;
+  text-align: left;
+}
+
+.json-generator label,
+.json-generator input,
+.json-generator select {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.json-generator input,
+.json-generator select {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #cccccc;
+  padding: 8px;
+}
+
+.json-generator button {
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #005ec9;
+  color: #ffffff;
+  border: none;
+}
+
+.json-generator button:hover {
+  background-color: #004bb5;
+}
+
+.json-generator pre {
+  background: #f4f4f4;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  color: #333333;
+}
+
+.json-generator a {
+  color: #005ec9;
+  text-decoration: none;
+}
+
+.json-generator a:hover {
+  text-decoration: underline;
+}
